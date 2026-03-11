@@ -5,7 +5,7 @@ const createOrder = async (req, res) => {
 
   const { phone } = req.body
 
-  if (!phone || phone.length > 20 ) {
+  if (!phone || phone.length > 20) {
     return res.json({
       message: "Invalid phone"
     })
@@ -13,7 +13,7 @@ const createOrder = async (req, res) => {
 
   const flashSale = await FlashSale.findOne()
 
-  const now = new Date();
+  const now = new Date()
 
   if (now < flashSale.startTime || now > flashSale.endTime) {
     return res.json({
@@ -21,7 +21,10 @@ const createOrder = async (req, res) => {
     })
   }
 
-  const existed = await PreOrder.findOne({ phone })
+  const existed = await PreOrder.findOne({
+    phone,
+    source: flashSale._id
+  })
 
   if (existed) {
     return res.json({
@@ -29,7 +32,9 @@ const createOrder = async (req, res) => {
     })
   }
 
-  const count = await PreOrder.countDocuments()
+  const count = await PreOrder.countDocuments({
+    source: flashSale._id
+  })
 
   if (count >= flashSale.saleStock) {
     return res.json({
@@ -37,12 +42,14 @@ const createOrder = async (req, res) => {
     })
   }
 
-  await PreOrder.create({ phone })
+  await PreOrder.create({
+    phone,
+    source: flashSale._id
+  })
 
   res.json({
     message: "Order success"
   })
-
 }
 
 module.exports = { createOrder }

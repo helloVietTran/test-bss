@@ -6,10 +6,10 @@ const preOrderSchema = new mongoose.Schema({
     required: true
   },
 
-  source: {
-    type: String,
-    default: "flash_sale"
-  },
+  source:  {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "FlashSale"
+    },
 
   createdAt: {
     type: Date,
