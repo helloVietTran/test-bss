@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Flash Sale</title>
+
+<style>
+
+body{
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f5f6fa;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.container{
+  background:white;
+  padding:30px;
+  border-radius:12px;
+  width:320px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+  text-align:center;
+}
+
+h2{
+  margin-bottom:10px;
+}
+
+.price{
+  font-size:20px;
+  color:#e84118;
+  font-weight:bold;
+  margin-bottom:20px;
+}
+
+input{
+  width:100%;
+  padding:10px;
+  border:1px solid #ddd;
+  border-radius:6px;
+  margin-bottom:15px;
+  font-size:14px;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:6px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.add{
+  background:#4cd137;
+  color:white;
+}
+
+.add:hover{
+  background:#44bd32;
+}
+
+.out{
+  background:#dcdde1;
+  color:#636e72;
+  cursor:not-allowed;
+}
+
+#msg{
+  margin-top:10px;
+  font-size:14px;
+  color:#e84118;
+}
+
+.flash-title{
+  color:#e84118;
+  margin-bottom:20px;
+}
+
+.no-product{
+  font-size:24px;
+  color:#e84118;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<% if(message){ %>
+
+<div class="container">
+<h2 class="no-product"><%= message %></h2>
+</div>
+
+<% } else { %>
+
+<div class="container">
+
+<h2 class="flash-title">Flash Sale</h2>
+
+<h3><%= product.name %></h3>
+
+<p class="price">$<%= product.price %> USD</p>
+
+<input id="phone" maxlength="20" placeholder="Enter phone number"/>
+
+<% if(outOfStock){ %>
+
+<button class="out" disabled>Out of stock</button>
+
+<% } else { %>
+
+<button class="add" onclick="order()">Add to cart</button>
+
+<% } %>
+
+<p id="msg"></p>
+
+</div>
+
+<script>
+
+async function order(){
+
+  const phone = document.getElementById("phone").value
+
+  if(!phone){
+    document.getElementById("msg").innerText="Phone required"
+    return
+  }
+
+  const res = await fetch("/order",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({phone})
+  })
+
+  const data = await res.json()
+
+  document.getElementById("msg").innerText=data.message
+
+  if(data.message==="Out of stock"){
+    location.reload()
+  }
+
+}
+
+</script>
+
+<% } %>
+
+</body>
+</html>
